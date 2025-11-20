@@ -16,6 +16,11 @@ app.use(
 app.use(express.json()); // Enable JSON parsing
 app.use("/api", routes); // Register API routes
 
+// Basic route to check if server is running
+app.get("/", (req, res) => {
+  res.send("---Backend is running---");
+});
+
 // Start the server (port 5000 or from environment variable)
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
