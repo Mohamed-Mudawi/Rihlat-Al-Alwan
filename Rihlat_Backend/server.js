@@ -5,14 +5,11 @@ import cors from "cors"; // Allowing frontend to access backend
 import routes from "./routes.js"; // Import API endpoints
 
 const app = express(); // Create an Express application
+
 // Enable CORS
-app.use(
-  cors({
-    origin: "*",
-    methods: ["GET", "POST"],
-    allowedHeaders: ["Content-Type"],
-  })
-);
+app.use(cors());
+app.options("*", cors());
+
 app.use(express.json()); // Enable JSON parsing
 app.use("/api", routes); // Register API routes
 
