@@ -1,4 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai"; // Importing Google Gemini library
+import { q1Prompt, q2Prompt, q3Prompt, chatPrompt } from "./prompts.js";
 
 // Gemini Client Initialization function
 function getClient() {
@@ -69,17 +70,9 @@ async function handleQ1(userAnswer, colorName, sessionId, res) {
         }
 
         const model = client.getGenerativeModel({ model: "gemini-2.5-flash" });
-        const result = await model.generateContent(`
-You are checking if the student's answer matches the correct Arabic color name.
-
-Correct answers: ${expectedArabic.join(", ")}
-Student answer: ${userAnswer}
-
-Respond with ONLY ONE word: "correct" or "wrong".
-If they say the pronounciation or have small spelling mistakes, consider it correct.
-If they give another form of the word, consider it correct.
-DO NOT explain, DO NOT add extra words.
-`);
+        const result = await model.generateContent(
+            q1Prompt({ expectedArabic, userAnswer })
+        );
 
         const response = await result.response;
         const text = response.text().trim().toLowerCase();
@@ -119,17 +112,9 @@ async function handleQ2(userAnswer, colorName, sessionId, res) {
         }
 
         const model = client.getGenerativeModel({ model: "gemini-2.5-flash" });
-        const result = await model.generateContent(`
-You are a teacher checking if the student's answer is a place or object that commonly matches the color "${colorName}".
-
-Color: ${colorName}
-Student answer: ${userAnswer}
-
-Rules:
-- If the place/object is something that usually has this color, respond ONLY with "correct".
-- If it is not something with this color, respond ONLY with "wrong".
-- DO NOT explain, DO NOT add extra words.
-`);
+        const result = await model.generateContent(
+            q2Prompt({ colorName, userAnswer })
+        );
 
         const response = await result.response;
         const text = response.text().trim().toLowerCase();
@@ -169,21 +154,9 @@ async function handleQ3(userAnswer, colorName, sessionId, res) {
         }
 
         const model = client.getGenerativeModel({ model: "gemini-2.5-flash" });
-        const result = await model.generateContent(`
-You are checking if a student's answer correctly includes the masculine and feminine forms of the Arabic color "${colorName}".
-
-Correct answers:
-Masculine: ${forms.masculine}
-Feminine: ${forms.feminine}
-
-Student answer:
-"${userAnswer}"
-
-Rules:
-- If BOTH forms appear in the student's answer (allow small spelling mistakes), respond ONLY with "correct".
-- If one or both are missing, respond ONLY with "wrong".
-- DO NOT explain anything.
-`);
+        const result = await model.generateContent(
+            q3Prompt({ forms, userAnswer, colorName })
+        );
 
         const response = await result.response;
         const text = response.text().trim().toLowerCase();
@@ -222,23 +195,9 @@ async function handleChat(userAnswer, colorName, sessionId, history = [], res) {
             .join("\n");
 
         const model = client.getGenerativeModel({ model: "gemini-2.5-flash" });
-        const result = await model.generateContent(`
-A user (arabic student) is having a conversation about the color ${colorName}.
-
-Here is the conversation so far:
-${conversationHistory}
-
-Continue the conversation naturally in a friendly and educational tone.
-Only speak in english, you may use arabic pronunciations, but only use ascii.
-
-Now respond to the student's latest message:
-
-Insert response ONLY in ascii text.
-Do NOT mention the fact that you are a teacher or that they are a student.
-
-Student: ${userAnswer}
-Teacher:
-`);
+        const result = await model.generateContent(
+            chatPrompt({ conversationHistory, colorName,userAnswer})
+        );
 
         const response = await result.response;
         const text = response.text();
