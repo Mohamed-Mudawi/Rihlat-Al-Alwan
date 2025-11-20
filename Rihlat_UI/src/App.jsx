@@ -95,7 +95,7 @@ export default function App() {
     setAiError(null);
     setLastAiRequest({ type: "start", colorName, sessionId });
     try {
-      const res = await fetch("http://localhost:5000/api/start", {
+      const res = await fetch("https://rihlat-al-alwan.onrender.com/api/start", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ colorName: (colorName || "").toLowerCase(), sessionId }),
@@ -119,7 +119,7 @@ export default function App() {
     setAiLoading(true);
     setAiError(null);
     try {
-      const res = await fetch("http://localhost:5000/api/answer", {
+      const res = await fetch("https://rihlat-al-alwan.onrender.com/api/answer", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
