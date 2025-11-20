@@ -8,7 +8,6 @@ const app = express(); // Create an Express application
 
 // Enable CORS
 app.use(cors());
-app.options("*", cors());
 
 app.use(express.json()); // Enable JSON parsing
 app.use("/api", routes); // Register API routes
